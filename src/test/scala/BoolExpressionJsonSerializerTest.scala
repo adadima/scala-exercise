@@ -122,4 +122,11 @@ class BoolExpressionJsonSerializerTest extends FunSuite {
       val actual: String = BoolExpressionJsonSerializer.serialize(Not(Or(False, Variable("haha"))))
       assert(actual == expected)
     }
+
+    // covers invalid input
+    test("Testing serialization of invalid input - null field") {
+      assertThrows[IllegalArgumentException] {
+        BoolExpressionJsonSerializer.serialize(And(null, True))
+      }
+    }
 }
