@@ -6,6 +6,7 @@ object Main extends App {
                       And(Or(Variable("x"), True), And(Or(False, False), Variable("xyz")))
   )
   //println(jstring)
-  //println(boolexpr.BoolExpressionJsonDeserializer.deserialize(jstring))
-  println(BoolExpressionJsonSerializer.serialize(Variable("x")))
+  val invalid: String = "{ \"value\": true, \"type\" : \"True\"}"
+  println(boolexpr.BoolExpressionJsonDeserializer.deserialize(invalid))
+
 }
