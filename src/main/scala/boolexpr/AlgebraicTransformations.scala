@@ -1,5 +1,7 @@
 package boolexpr
 
+import scala.collection.mutable
+
 object AlgebraicTransformations {
 
   private[this] def simplifyAnd(expression: And): BooleanExpression = {
@@ -40,6 +42,78 @@ object AlgebraicTransformations {
       case Or(e1, e2) => simplifyOr(Or(simplify(e1, variable, value), simplify(e2, variable, value)))
       case And(e1, e2) => simplifyAnd(And(simplify(e1, variable, value), simplify(e2, variable, value)))
     }
+  }
+
+  private[this] def getAllVariables(expression: BooleanExpression): mutable.Set[Variable] = {
+      val vars: mutable.Set[Variable] = mutable.Set()
+      expression match {
+        case True => vars
+        case False => vars
+        case Variable(name) => vars += Variable(name)
+        case And(e1, e2) => vars ++= getAllVariables(e1) ++ getAllVariables(e2)
+        case Or(e1, e2) => vars ++= getAllVariables(e1) ++ getAllVariables(e2)
+        case Not(e) => vars ++= getAllVariables(e)
+      }
+  }
+
+  private[this] def findAllSolutions(expression: BooleanExpression,
+                                     varsToAssign: mutable.Set[Variable],
+                                     assignments: Map[Variable, BooleanExpression],
+                                     solns: mutable.Set[Map[Variable, BooleanExpression]]):Unit = {
+    if (expression.equals(True)) {
+      solns.add(assignments)
+    }
+
+    if (varsToAssign.isEmpty) {
+      return
+    }
+
+    val variable = varsToAssign.head
+    varsToAssign.remove(variable)
+
+    // try reducing with variable: True
+    val simpleExprTrue = simplify(expression, variable, True)
+    if (!simpleExprTrue.equals(False)) {
+      findAllSolutions(simpleExprTrue, varsToAssign, assignments + (variable -> True), solns)
+    }
+
+    //try reducing with variable: False
+    val simpleExprFalse = simplify(expression, variable, False)
+    if (!simpleExprFalse.equals(False)) {
+      findAllSolutions(simpleExprFalse, varsToAssign, assignments + (variable -> False), solns)
+    }
+
+  }
+
+  private[this] def makeAndExpression(vars: Map[Variable, BooleanExpression]): BooleanExpression = {
+    var and: BooleanExpression = True
+
+    for(variable <- vars.keySet) {
+//      if (and.equals(True)){
+//        and = vars.getOrElse(variable, True)
+//      } else {
+        and = if (vars.getOrElse(variable, True).equals(True)) And(and, variable) else And(and, Not(variable))
+//      }
+    }
+    and
+  }
+
+  def convertToDNF(expression: BooleanExpression): BooleanExpression = {
+      val vars: mutable.Set[Variable] = getAllVariables(expression)
+      val allSolutions = mutable.Set[Map[Variable, BooleanExpression]]()
+
+      findAllSolutions(expression, vars, Map(), allSolutions)
+      var dnf: BooleanExpression = False
+
+      for (sol <- allSolutions) {
+        if (dnf.equals(False)) {
+          dnf = makeAndExpression(sol)
+        } else {
+          dnf = Or(dnf, makeAndExpression(sol))
+        }
+      }
+
+      dnf
   }
 
 }
