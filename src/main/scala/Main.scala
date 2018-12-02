@@ -1,12 +1,9 @@
 import boolexpr._
 import boolexpr.BoolExpressionJsonSerializer
+import boolexpr.AlgebraicTransformations.simplify
 
 object Main extends App {
-  val jstring: String = boolexpr.BoolExpressionJsonSerializer.serialize(
-                      And(Or(Variable("x"), True), And(Or(False, False), Variable("xyz")))
-  )
-  //println(jstring)
-  val invalid: String = "{ \"value\": true, \"type\" : \"True\"}"
-  println(boolexpr.BoolExpressionJsonDeserializer.deserialize(invalid))
+  val exp: BooleanExpression = And(Variable("x"), And(Not(Variable("z")), Or(Variable("y"), Not(Variable("x")))))
+  println(simplify(simplify(exp, Variable("z"), False), Variable("x"), True))
 
 }
