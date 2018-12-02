@@ -2,7 +2,7 @@ package boolexpr
 
 object AlgebraicTransformations {
 
-  def simplifyAnd(expression: And): BooleanExpression = {
+  private[this] def simplifyAnd(expression: And): BooleanExpression = {
       expression match {
         case And(True, e) => e
         case And(e, True) => e
@@ -13,7 +13,7 @@ object AlgebraicTransformations {
       }
   }
 
-  def simplifyOr(expression: Or): BooleanExpression = {
+  private[this] def simplifyOr(expression: Or): BooleanExpression = {
       expression match {
         case Or(True, e) => True
         case Or(e, True) => True
@@ -23,7 +23,7 @@ object AlgebraicTransformations {
       }
   }
 
-  def simplifyNot(expression: Not): BooleanExpression = {
+  private[this] def simplifyNot(expression: Not): BooleanExpression = {
       expression match {
         case Not(True) => False
         case Not(False) => True
