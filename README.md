@@ -65,18 +65,27 @@ expression or field passed to a BooleanExpression is null.
  ```
 
 Examples of valid input:
- 
- - "{\n  "value" : true,\n  "type" : "True"\n}"
+ ```
+ - "{
+      "value" : true,
+      "type" : "True"
+    }"
  - "{"name":"x", "type":"Variable"}"
- - "{\n"leftExpression": ...,\n"rightExpression": ...,\n"type":"And}
- 
+ - "{
+    "leftExpression": ...,
+    "rightExpression": ...,
+    "type":"And
+    }"
+ ```
  Examples of invalid input (method will throw IllegalArgumentException):
- 
- - "{\n  "value" : true,\n  "type" : "True"\n (mismatched parenthesis)
+ ```
+ - "{
+      "value" : true,
+      "type" : "True" " (mismatched parenthesis)
  - {"var" : "x", "class" : "Variable"} (not following the standard for field names)
  - {"value": true, "type":False} (inconsistent field values)
  - {"value":true} (missing field "type")
- 
+ ```
  
 
 Moreover, this package also allows algebraic transformations 
@@ -85,15 +94,15 @@ improvement) like:
 
 - Simplifying a BooleanExpression given an assignment from a Variable(x) 
 to True/False
-   
+   ```
        import boolexpr.AlgebraicTransformations.simplify
        simplify(expression, variable, value)
-   
+   ```
 - Convert a BooleanExpression to its Disjunctive Normal Form.
-
+    ```
         import boolexpr.AlgebraicTransformations.convertToDNF
         convertToDNF(expression)
-    
+    ```
 Currently in work:
 
 - Server that receives expressions (as JSON strings) from a client, convert them to
