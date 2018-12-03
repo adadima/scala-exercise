@@ -8,17 +8,16 @@ object AlgebraicTransformations {
       expression match {
         case And(True, e) => e
         case And(e, True) => e
-        case And(True, True) => True
-        case And(False, e) => False
-        case And(e, False) => False
+        case And(False, _) => False
+        case And(_, False) => False
         case And(e1, e2) => And(e1, e2)
       }
   }
 
   private[this] def simplifyOr(expression: Or): BooleanExpression = {
       expression match {
-        case Or(True, e) => True
-        case Or(e, True) => True
+        case Or(True, _) => True
+        case Or(_, True) => True
         case Or(False, e) => e
         case Or(e, False) => e
         case Or(e1, e2) => Or(e1, e2)
@@ -45,7 +44,8 @@ object AlgebraicTransformations {
   }
 
   private[this] def getAllVariables(expression: BooleanExpression): mutable.Set[Variable] = {
-      val vars: mutable.Set[Variable] = mutable.Set()
+      val vars = mutable.Set[Variable] ()
+
       expression match {
         case True => vars
         case False => vars
@@ -99,7 +99,7 @@ object AlgebraicTransformations {
   }
 
   def convertToDNF(expression: BooleanExpression): BooleanExpression = {
-      val vars: mutable.Set[Variable] = getAllVariables(expression)
+      val vars = getAllVariables(expression)
       val allSolutions = mutable.Set[Map[Variable, BooleanExpression]]()
 
       findAllSolutions(expression, vars, Map(), allSolutions)

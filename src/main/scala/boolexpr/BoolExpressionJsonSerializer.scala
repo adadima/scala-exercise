@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 /**
   * Json Serializer for boolexpr.BooleanExpression
-  * import: boolexpr.BoolExpressionJsonSerialier._
+  * import: boolexpr.BoolExpressionJsonSerialier.serialize
   */
 object BoolExpressionJsonSerializer {
 
