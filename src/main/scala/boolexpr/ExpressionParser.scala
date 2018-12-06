@@ -68,7 +68,12 @@ object ExpressionParser {
         throw new IllegalArgumentException("Syntax Error")
       }
 
-      Tuple2(Variable(tokens(nextIndex + 2)), nextIndex + 3)
+      try {
+        Tuple2(Variable(tokens(nextIndex + 2).substring(1, tokens(nextIndex + 2).length - 1)), nextIndex + 4)
+      } catch {
+        case _: StringIndexOutOfBoundsException => throw new IllegalArgumentException("syntax error -" +
+          "variable names need to be put in qutoes")
+      }
     }
 
     /*
@@ -101,9 +106,15 @@ object ExpressionParser {
     * @param expression string to parse. Needs to follow the
     *                   formatting rules one would use when
     *                   actually instantiating a BooleanExpression
-    *                   object in scala. Additional spaces do not
+    *                   object in scala.
+    *
+    *                   Additional spaces do not
     *                   influence the value returned by this method,
     *                   but new lines should not be present in this string.
+    *
+    *                   All variable names used in strings denoting the Variable
+    *                   case class should be enclosed in quotes, just like one would
+    *                   do when instantiating a Variable object with a string passed.
     *
     *                   Ex: the strings below evaluate to the same BoolenExpression
     *                   "And( Not(  True), Variable(  "x"  ))" and
@@ -111,10 +122,15 @@ object ExpressionParser {
     *
     * @return a BooleanExpression object represented by the input string.
     * @throws IllegalArgumentException if the given string could not be parsed
-    *                                  due to synthax errors
+    *                                  due to syntax errors
     */
     def parse(expression: String):BooleanExpression = {
-      parseWithIndex(tokenize(expression), 0)._1
+
+      val tokens = tokenize(expression)
+      val expressionIndex = parseWithIndex(tokenize(expression), 0)
+      println(expressionIndex)
+      if (expressionIndex._2 == tokens.length ) expressionIndex._1 else
+        throw new IllegalArgumentException("The input has a syntax error: too many right parenthesis at the end")
     }
 
 
