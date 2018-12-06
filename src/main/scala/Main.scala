@@ -1,5 +1,12 @@
 import boolexpr._
 
+
+import ExpressionParser._
+
+
 object Main extends App {
-  val server: Server = new Server(4444)
+  for (tok <- tokenize("And(True, And(False, Not(Variable(x))))").toList) {
+    println(tok)
+  }
+  println(parse("And(True, And(False, Not(Variable(x))))"))
 }
