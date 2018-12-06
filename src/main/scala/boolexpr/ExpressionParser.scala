@@ -128,7 +128,7 @@ object ExpressionParser {
 
       val tokens = tokenize(expression)
       val expressionIndex = parseWithIndex(tokenize(expression), 0)
-      println(expressionIndex)
+
       if (expressionIndex._2 == tokens.length ) expressionIndex._1 else
         throw new IllegalArgumentException("The input has a syntax error: too many right parenthesis at the end")
     }

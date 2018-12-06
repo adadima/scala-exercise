@@ -16,7 +16,13 @@ class Server(port: Integer) {
 
       while (true) {
         val client = serverSocket.accept()
-        new Thread(() => handleClient(client))
+        println("accepted connection")
+        new Thread(() =>
+          try {
+            handleClient(client)
+          } catch{
+            case e: Exception => e.getMessage + "Continuing to serve..."
+          }).start()
       }
 
     def handleClient(client: Socket):Unit= {
@@ -25,13 +31,13 @@ class Server(port: Integer) {
 
       while (true) {
 
-        //TODO: the json is on multiple lines, so figure out a protocol and how to read it
         val jsonExpression: String = reader.readLine()
         if (jsonExpression.equals(null)) break
 
         try {
           val expression: BooleanExpression = deserialize(jsonExpression)
-          writer.println(serialize(convertToDNF(expression)))
+          writer.println(serialize(convertToDNF(expression)).toCharArray.foldLeft("")((x: String, y: Char) =>
+              if (! y.equals('\n')) x + y else x))
         } catch {
           case e: IllegalArgumentException => writer.println("The request was badly formatted, see the following error: " +
             e.getMessage)
