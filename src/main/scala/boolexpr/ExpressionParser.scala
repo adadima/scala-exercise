@@ -15,10 +15,10 @@ object ExpressionParser {
      */
     def tokenize(expression: String): Array[String] = {
 
-      val newString: String = expression.toCharArray.foldLeft("")( (x: String, y: Char) =>
+      val expressionWithSpaces: String = expression.toCharArray.foldLeft("")( (x: String, y: Char) =>
         if (y.equals('(') || y.equals(')') || y.equals(',')) x + " " + y + " " else x + y)
 
-      newString.split("\\s+")
+      expressionWithSpaces.split("\\s+")
     }
 
     /*
