@@ -77,7 +77,7 @@ object AlgebraicTransformations {
                                      varsToAssign: Set[Variable],
                                      assignments: Map[Variable, BooleanExpression],
                                      solns: mutable.Set[Map[Variable, BooleanExpression]]):Unit = {
-    
+
     if (varsToAssign.isEmpty) {
       solns.add(assignments)
     }

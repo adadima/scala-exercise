@@ -17,9 +17,8 @@ object Client extends App {
   while(true) {
 
     val input = readLine()
-
-    //TODO: Look into this, the client does not disconect when QUIT is typed??
-    if(input.equals("QUIT\n")) {
+    
+    if(input.equals("QUIT")) {
       println("Closing connection to server...")
       break
     }
