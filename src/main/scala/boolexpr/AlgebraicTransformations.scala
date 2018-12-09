@@ -60,7 +60,7 @@ object AlgebraicTransformations {
                                      varsToAssign: mutable.Set[Variable],
                                      assignments: Map[Variable, BooleanExpression],
                                      solns: mutable.Set[Map[Variable, BooleanExpression]]):Unit = {
-    if (expression.equals(True)) {
+    if (varsToAssign.isEmpty) {
       solns.add(assignments)
     }
 
@@ -85,15 +85,19 @@ object AlgebraicTransformations {
 
   }
 
-  private[this] def makeAndExpression(vars: Map[Variable, BooleanExpression]): BooleanExpression = {
+  def makeAndExpression(vars: Map[Variable, BooleanExpression]): BooleanExpression = {
     var and: BooleanExpression = True
 
+    if (vars.size == 1) {
+      return vars(vars.keys.iterator.next())
+    }
+
     for(variable <- vars.keySet) {
-//      if (and.equals(True)){
-//        and = vars.getOrElse(variable, True)
-//      } else {
-        and = if (vars.getOrElse(variable, True).equals(True)) And(and, variable) else And(and, Not(variable))
-//      }
+      if (and == True)
+        and = variable
+      else
+        and = if (vars(variable).equals(True)) And(and, variable) else And(and, Not(variable))
+
     }
     and
   }
