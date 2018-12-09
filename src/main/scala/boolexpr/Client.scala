@@ -6,7 +6,15 @@ import scala.io.StdIn.readLine
 import scala.util.control.Breaks.break
 import java.nio.charset.StandardCharsets
 
-
+/**
+  * Client for boolexpr.Server
+  *
+  * Accepts input from the console that
+  * should represent a BooleanExpression object.
+  * Communicates with Server in order to compute
+  * the full disjunctive normal form of the
+  * input formula and prints it to the console.
+  */
 object Client extends App {
 
   val socket = new Socket("localhost", 4444)
@@ -17,14 +25,14 @@ object Client extends App {
   while(true) {
 
     val input = readLine()
-    
+
     if(input.equals("QUIT")) {
       println("Closing connection to server...")
       break
     }
 
     try {
-
+      // parse the input to a BooleanExpression, serialize it to JSON, write it to server
       writer.println(
         BoolExpressionJsonSerializer.serialize(ExpressionParser.parse(input.substring(0, input.length))).
           toCharArray.
@@ -37,6 +45,7 @@ object Client extends App {
     }
 
     writer.flush()
+    // deserialize the response from server and print it
     print(BoolExpressionJsonDeserializer.deserialize(reader.readLine()) + "\n")
 
   }
