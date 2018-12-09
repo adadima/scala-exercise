@@ -2,7 +2,16 @@
 
 This repository contains the boolexpr package which offers support for JSON 
 serialization and deserialization of the objects and case classes pertaining 
-to the `BooleanExpression` trait (defined in `boolexpr.BooleanExpression`).
+to the `BooleanExpression` trait (defined in `boolexpr.BooleanExpression`). 
+
+It also allows doing certain alegbraic transformations on BooleanExpressions 
+(like simplifcation and convertion to full disjunctive normal form) as well as parsing
+string expressions to BooleanExpression objects. A client process is also presented.
+It accepts boolean expressions input from the user, parses it and communicates with the server,
+which applies an algebraic transformation on the expression. Ultimately, the client prints to
+the user the result of the transformation. 
+
+All these features are detailed below.
 
 ### Using the serializer
 
@@ -87,6 +96,7 @@ Examples of valid input:
  - {"value":true} (missing field "type")
  ```
  
+### Algebraic Transformation 
 
 Moreover, this package also allows algebraic transformations 
 (through boolexpr.AlgebraicTransformations, which is still under
@@ -96,17 +106,52 @@ improvement) like:
 to True/False
    ```
        import boolexpr.AlgebraicTransformations.simplify
-       simplify(expression, variable, value)
+       simplifyWithAssignment(expression, variable, value)
    ```
-- Convert a BooleanExpression to its Disjunctive Normal Form.
+   Examples: 
+     ```
+       simplifyWithAssignment(Or(Variable("x"), Variable("y")), Variable("y"), False) = Variable("x")
+       simplifyWithAssignment(And(Variable("x"), Variable("y")), Variable("x"), False) = False
+     ```
+- Convert a BooleanExpression to its Full Disjunctive Normal Form (and clauses connected by or operators). 
+  This means that the each inner and clause contains all variables in the initial boolean expression, either
+  negated or not.
     ```
         import boolexpr.AlgebraicTransformations.convertToDNF
         convertToDNF(expression)
     ```
-Currently in work:
+    
+    Example:
+     ```
+        convertToDNF(And(Or(True, Variable("x")), Not(Variable("y")))) = Or(
+                                                                            And(Not(Variable("x")), Not(Variable("y"))),  
+                                                                            And(Variable("x"), Not(Variable("y"))
+                                                                            )
+    ```
+    Note that the order of the inner "And" clauses inside the Or expressions as well as the order of the variables inside the "And" 
+    expressions is arbitrary.
+        
+### Parsing Expressions 
+The package also offers support for parsing strings as BooleanExpressions. To use it, one needs to import the
+parse method from boolexpr.ExpressionParser. The input string should look exactly as the code one would use to instantiate a BooleanExpression object (see example below). If the string input to the parse() method is not properly formatted,
+the method would raise an IllegalArgumentException.
 
-- Server that receives expressions (as JSON strings) from a client, convert them to
-DNF and sends back the response.
-- Client that takes input from a console user, parser input to BooleanExpression, 
-and sends request (for DNF conversion) to the server, serializing the input first.
-- ExpressionParser which parses a string and returns a BooleanExpression.
+ ```
+        parse("True") = True
+        parse("False") = False
+        parse("And(Variable(\"x\"), Variable(\"y\"))") = And(Variable("x"), Variable("y"))
+        etc.
+ ```
+
+### The server and the client
+Finally, there is also a Server class (boolexpr.Server) which represents a server receiving BooleanExpression expressions serialized
+into JSON from a client, converts them to the Full DNF and then sends the response as a JSON back to the client.
+
+The server can be started by instantiating the Server class with a given port number and calling it's method serve(). This is exemplified in boolexpr.ServerMain, which can be ran to start the server. The server continues to listen for new connections unless
+the process is intentionally terminated.
+
+The client process is located in boolexpr.Client. This client accepts boolean expression strings from the console and prints back their
+full disjunctive normal forms( communicates with the server to do this, so the server needs to be started beforehand ). 
+
+Again, similar to the requirements for the ExpressionParser, the console input should look exactly as the code one would use to instantiate a BooleanExpression object.
+
