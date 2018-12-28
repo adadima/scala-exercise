@@ -39,14 +39,15 @@ object Client extends App {
           foldLeft("")((x: String, y: Char) =>
             if (!y.equals('\n')) x + y else x)
       )
+
+      writer.flush()
+      // deserialize the response from server and print it
+      print(BoolExpressionJsonDeserializer.deserialize(reader.readLine()) + "\n")
+
     } catch {
 
       case e: Exception =>  println("Your input could not be parsed, see the errors: " + e.getMessage)
     }
-
-    writer.flush()
-    // deserialize the response from server and print it
-    print(BoolExpressionJsonDeserializer.deserialize(reader.readLine()) + "\n")
 
   }
 
